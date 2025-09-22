@@ -1,16 +1,12 @@
 #!/bin/sh
 
-# remove bin
-sudo rm -rf /usr/local/bin/nvim
+# Exit immediately if a command exits with a non-zero status.
+set -e
 
-# remove lib
-sudo rm -rf /usr/local/lib/nvim
-
-# remove share
-sudo rm -rf /usr/local/share/nvim
-sudo rm -rf /usr/local/share/applications
-sudo rm -rf /usr/local/share/icons
-sudo rm -rf /usr/local/share/man
+# remove bin sym link
+sudo unlink /usr/local/bin/nvim
 
 # delete nvim files in /opt
 sudo rm -rf /opt/nvim-*
+
+echo "Neovim has been uninstalled."
