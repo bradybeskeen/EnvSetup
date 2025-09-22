@@ -4,4 +4,4 @@
 sudo apt-get update
 sudo apt-get install -y ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config unzip curl
 
-source ./general.sh
+. ./general.sh
