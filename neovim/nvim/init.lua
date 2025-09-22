@@ -190,7 +190,70 @@ require('lazy').setup {
   --
   -- Then, because we use the `opts` key (recommended), the configuration runs
   -- after the plugin has been loaded as `require(MODULE).setup(opts)`.
+  {
+    'folke/persistence.nvim',
+    event = 'VimEnter', -- Tries to load the session when you start nvim
+    config = function()
+      require('persistence').setup {}
+    end,
+  },
+  {
+    'MaximilianLloyd/ascii.nvim',
+    dependencies = {
+      'MunifTanjim/nui.nvim',
+    },
+  },
+  {
+    'goolord/alpha-nvim',
+    event = 'VimEnter',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = function()
+      local alpha = require 'alpha'
+      local dashboard = require 'alpha.themes.dashboard'
+      local ascii = require 'ascii'
 
+      -- ASCII Art Header
+      -- More art: https://github.com/MaximilianLloyd/ascii.nvim
+      dashboard.section.header.val = ascii.get_random('text', 'neovim')
+
+      -- Menu Buttons
+      dashboard.section.buttons.val = {
+        dashboard.button('r', '  Restore Session', "<cmd>lua require('persistence').load()<cr>"),
+        dashboard.button('n', '  New File', '<cmd>enew<cr>'),
+        dashboard.button('f', '  Find File', "<cmd>lua require('fzf-lua').files()<cr>"),
+        dashboard.button('g', '  Find Word', "<cmd>lua require('fzf-lua').live_grep()<cr>"),
+        dashboard.button('q', '  Quit', '<cmd>qa<cr>'),
+      }
+
+      -- Startup Logic:
+      -- Conditionally start alpha. If a session was restored, alpha will be hidden.
+      -- If there is no session to restore, alpha will be shown.
+      local function on_session_load()
+        local successful, session = pcall(require('persistence').load)
+        if successful and session then
+          -- If a session was restored, hide Alpha
+          require('alpha').close()
+        end
+      end
+
+      -- If persistence.nvim is set up, use its logic, otherwise just start alpha
+      if pcall(require, 'persistence') then
+        vim.api.nvim_create_autocmd('VimEnter', {
+          nested = true,
+          pattern = '*',
+          callback = on_session_load,
+        })
+      else
+        -- Fallback to just showing the dashboard if persistence isn't available
+        alpha.setup(dashboard.opts)
+      end
+
+      -- If no session was restored, show the dashboard
+      if not vim.g.persistence_loaded then
+        alpha.setup(dashboard.opts)
+      end
+    end,
+  },
   { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
@@ -494,18 +557,14 @@ require('lazy').setup {
       {
         '<leader>ss',
         function()
-          require('fzf-lua').lsp_document_symbols {
-            regex_filter = symbols_filter,
-          }
+          require('fzf-lua').lsp_document_symbols()
         end,
         desc = 'Goto Symbol',
       },
       {
         '<leader>sS',
         function()
-          require('fzf-lua').lsp_live_workspace_symbols {
-            regex_filter = symbols_filter,
-          }
+          require('fzf-lua').lsp_live_workspace_symbols()
         end,
         desc = 'Goto Symbol (Workspace)',
       },
@@ -613,26 +672,13 @@ require('lazy').setup {
           -- Jump to the type of the word under your cursor.
           map('grt', require('fzf-lua').lsp_typedefs, '[G]oto [T]ype Definition')
 
-          -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
-          ---@param client vim.lsp.Client
-          ---@param method vim.lsp.protocol.Method
-          ---@param bufnr? integer some lsp support methods only in specific files
-          ---@return boolean
-          local function client_supports_method(client, method, bufnr)
-            if vim.fn.has 'nvim-0.11' == 1 then
-              return client:supports_method(method, bufnr)
-            else
-              return client.supports_method(method, { bufnr = bufnr })
-            end
-          end
-
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
           --    See `:help CursorHold` for information about when this is executed
           --
           -- When you move your cursor, the highlights will be cleared (the second autocommand).
           local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
+          if client and client.server_capabilities.documentHighlightProvider then
             local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
             vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
               buffer = event.buf,
@@ -659,7 +705,7 @@ require('lazy').setup {
           -- code, if the language server you are using supports them
           --
           -- This may be unwanted, since they displace some of your code
-          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
+          if client and client.server_capabilities.inlayHintProvider then
             map('<leader>xh', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
             end, 'Toggle Inlay Hints')
@@ -881,7 +927,12 @@ require('lazy').setup {
     end,
   },
   -- Highlight todo, notes, etc in comments
-  { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
+  {
+    'folke/todo-comments.nvim',
+    event = 'VimEnter',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    opts = { signs = false },
+  },
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
@@ -914,7 +965,19 @@ require('lazy').setup {
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'diff',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'query',
+        'vim',
+        'vimdoc',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
