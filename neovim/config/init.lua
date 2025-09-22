@@ -218,7 +218,7 @@ require('lazy').setup {
 
       -- Menu Buttons
       dashboard.section.buttons.val = {
-        dashboard.button('r', '  Restore Session', "<cmd>lua require('persistence').load()<cr>"),
+        dashboard.button('s', '  Restore Session', "<cmd>lua require('persistence').load()<cr>"),
         dashboard.button('n', '  New File', '<cmd>enew<cr>'),
         dashboard.button('f', '  Find File', "<cmd>lua require('fzf-lua').files()<cr>"),
         dashboard.button('g', '  Find Word', "<cmd>lua require('fzf-lua').live_grep()<cr>"),
