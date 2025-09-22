@@ -13,6 +13,9 @@ vim.g.have_nerd_font = true
 vim.o.number = true
 vim.o.relativenumber = true
 
+-- Always show the tabline, so the buffer list is visible
+vim.o.showtabline = 2
+
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
 
@@ -101,8 +104,8 @@ vim.keymap.set('n', '<leader>wl', '<C-w>l', { desc = 'Move to right window' })
 -- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
 
 -- [[ Buffer Navigation and Management ]]
-vim.keymap.set('n', '<leader>bd', '<cmd>bdelete<CR>', { desc = '[B]uffer [D]elete' })
-vim.keymap.set('n', '<leader>bc', '<cmd>%bd|e#<CR>', { desc = '[B]uffer [C]lose All Others' })
+vim.keymap.set('n', '<leader>bd', '<cmd>bdelete<CR>', { desc = 'Delete Buffer' })
+vim.keymap.set('n', '<leader>bc', '<cmd>%bd|e#<CR>', { desc = 'Close All Other Buffers' })
 vim.keymap.set('n', 'H', '<cmd>bprevious<CR>', { desc = 'Previous Buffer' })
 vim.keymap.set('n', 'L', '<cmd>bnext<CR>', { desc = 'Next Buffer' })
 
@@ -116,6 +119,24 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
     vim.hl.on_yank()
+  end,
+})
+
+-- Go to last location when opening a buffer
+vim.api.nvim_create_autocmd('BufReadPost', {
+  desc = 'Go to last location when opening a buffer',
+  group = vim.api.nvim_create_augroup('last_loc', { clear = true }),
+  pattern = '*',
+  callback = function(event)
+    -- Check if the file mark is set
+    local mark = vim.api.nvim_buf_get_mark(event.buf, '"')
+    local line_num = mark[1]
+    local last_line = vim.api.nvim_buf_line_count(event.buf)
+
+    -- If the mark is valid (line > 0 and not past the end of the file), jump to it
+    if line_num > 0 and line_num <= last_line then
+      vim.api.nvim_win_set_cursor(0, mark)
+    end
   end,
 })
 
@@ -216,11 +237,15 @@ require('lazy').setup {
 
       -- Document existing key chains
       spec = {
-        { '<leader>s', group = '[S]earch' },
-        { '<leader>t', group = '[T]oggle' },
-        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>s', group = 'Search' },
+        { '<leader>t', group = 'Trouble' },
+        { '<leader>h', group = 'Git Hunk', mode = { 'n', 'v' } },
         { '<leader>c', group = 'code' },
         { '<leader>w', group = 'window' },
+        { '<leader>g', group = 'git' },
+        { '<leader>f', group = 'find' },
+        { '<leader>b', group = 'buffers' },
+        { '<leader>x', group = 'extras' },
       },
     },
   },
@@ -230,12 +255,12 @@ require('lazy').setup {
     cmd = 'Trouble',
     keys = {
       {
-        '<leader>xx',
+        '<leader>tx',
         '<cmd>Trouble diagnostics toggle<cr>',
         desc = 'Diagnostics (Trouble)',
       },
       {
-        '<leader>xX',
+        '<leader>tX',
         '<cmd>Trouble diagnostics toggle filter.buf=0<cr>',
         desc = 'Buffer Diagnostics (Trouble)',
       },
@@ -250,12 +275,12 @@ require('lazy').setup {
         desc = 'LSP Definitions / references / ... (Trouble)',
       },
       {
-        '<leader>xL',
+        '<leader>tL',
         '<cmd>Trouble loclist toggle<cr>',
         desc = 'Location List (Trouble)',
       },
       {
-        '<leader>xQ',
+        '<leader>tQ',
         '<cmd>Trouble qflist toggle<cr>',
         desc = 'Quickfix List (Trouble)',
       },
@@ -264,13 +289,14 @@ require('lazy').setup {
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
-      -- ... (your other mini.nvim setups are here) ...
       require('mini.ai').setup { n_lines = 500 }
       require('mini.surround').setup()
       require('mini.statusline').setup { use_icons = vim.g.have_nerd_font }
 
-      -- UPDATED TABLINE CONFIGURATION
       require('mini.tabline').setup {
+        show_buffers = true,
+        show_tabs = false,
+        show_args = false,
         -- Enable smart mouse support
         enable_mouse = true,
         -- Show buffer icons
@@ -320,7 +346,6 @@ require('lazy').setup {
           cwd_prompt = false,
           actions = {
             ['default'] = actions.file_edit,
-
             ['ctrl-t'] = trouble_actions and trouble_actions.open,
             ['ctrl-r'] = function(_, ctx)
               local opts = ctx.__call_opts
@@ -363,13 +388,6 @@ require('lazy').setup {
         desc = 'Grep (Root Dir)',
       },
       { '<leader>:', '<cmd>FzfLua command_history<cr>', desc = 'Command History' },
-      {
-        '<leader><space>',
-        function()
-          require('fzf-lua').files()
-        end,
-        desc = 'Find Files (Root Dir)',
-      },
       -- find
       { '<leader>fb', '<cmd>FzfLua buffers sort_mru=true sort_lastused=true<cr>', desc = 'Buffers' },
       {
@@ -467,11 +485,11 @@ require('lazy').setup {
         desc = 'Selection (cwd)',
       },
       {
-        '<leader>uC',
+        '<leader>xc',
         function()
           require('fzf-lua').colorschemes()
         end,
-        desc = 'Colorscheme with Preview',
+        desc = 'Colorschemes',
       },
       {
         '<leader>ss',
@@ -642,9 +660,9 @@ require('lazy').setup {
           --
           -- This may be unwanted, since they displace some of your code
           if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
-            map('<leader>th', function()
+            map('<leader>xh', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
-            end, '[T]oggle Inlay [H]ints')
+            end, 'Toggle Inlay Hints')
           end
         end,
       })
@@ -745,7 +763,6 @@ require('lazy').setup {
       }
     end,
   },
-
   { -- Autoformat
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
@@ -849,12 +866,7 @@ require('lazy').setup {
       signature = { enabled = true },
     },
   },
-
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
+  { --Using the tokyonight colorscheme
     'folke/tokyonight.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     config = function()
@@ -864,52 +876,36 @@ require('lazy').setup {
           comments = { italic = false }, -- Disable italics in comments
         },
       }
-
       -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       vim.cmd.colorscheme 'tokyonight-night'
     end,
   },
-
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
-
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
-      -- Better Around/Inside textobjects
-      --
-      -- Examples:
-      --  - va)  - [V]isually select [A]round [)]paren
-      --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
-      --  - ci'  - [C]hange [I]nside [']quote
+      -- Set up all the mini.nvim modules here in one place
       require('mini.ai').setup { n_lines = 500 }
-
-      -- Add/delete/replace surroundings (brackets, quotes, etc.)
-      --
-      -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-      -- - sd'   - [S]urround [D]elete [']quotes
-      -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
 
-      -- Simple and easy statusline.
-      --  You could remove this setup call if you don't like it,
-      --  and try some other statusline plugin
+      -- Configure and set up the statusline
       local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
       statusline.setup { use_icons = vim.g.have_nerd_font }
-
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
+      -- Customize the location section to be 'LINE:COLUMN'
       ---@diagnostic disable-next-line: duplicate-set-field
       statusline.section_location = function()
         return '%2l:%-2v'
       end
 
-      -- ... and there is more!
-      --  Check out: https://github.com/echasnovski/mini.nvim
+      -- Configure and set up the tabline to show buffers
+      require('mini.tabline').setup {
+        show_buffers = true,
+        show_tabs = false,
+        show_args = false,
+        enable_mouse = true,
+        show_icons = vim.g.have_nerd_font,
+      }
     end,
   },
   { -- Highlight, edit, and navigate code
@@ -937,8 +933,4 @@ require('lazy').setup {
 
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   -- { import = 'custom.plugins' },
-  --
 }
-
--- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
