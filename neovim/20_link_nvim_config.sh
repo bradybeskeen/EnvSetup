@@ -11,6 +11,6 @@ mkdir -p ~/.config/nvim
 
 # Create or overwrite the symbolic link using the script's location
 # to build a full, absolute path to the source `nvim` folder.
-ln -sf "$SCRIPT_DIR/nvim/"* ~/.config/nvim/
+ln -sf "$SCRIPT_DIR/config/"* ~/.config/nvim/
 
 echo "Neovim config linked successfully!"
