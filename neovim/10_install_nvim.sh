@@ -19,7 +19,6 @@ rm -f "$NVIM_FILENAME.tar.gz"
 sudo mv $NVIM_FILENAME /opt
 
 # Sym link the nvim files into the filesystem
-sudo ln -s /opt/$NVIM_FILENAME/bin/* /usr/local/bin/
-sudo ln -s /opt/$NVIM_FILENAME/lib/* /usr/local/lib/
-sudo ln -s /opt/$NVIM_FILENAME/share/* /usr/local/share/
-
+sudo cp -r /opt/$NVIM_FILENAME/bin/* /usr/local/bin/
+sudo cp -r /opt/$NVIM_FILENAME/lib/* /usr/local/lib/
+sudo cp -r /opt/$NVIM_FILENAME/share/* /usr/local/share/
