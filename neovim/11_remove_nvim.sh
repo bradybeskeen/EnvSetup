@@ -4,7 +4,8 @@
 set -e
 
 # remove bin sym link
-sudo unlink /usr/local/bin/nvim
+sudo rm -f /usr/local/bin/nvim
+sudo rm -f /usr/local/share/man/man1/nvim.1
 
 # delete nvim files in /opt
 sudo rm -rf /opt/nvim-*

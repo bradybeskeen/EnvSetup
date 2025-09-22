@@ -27,4 +27,10 @@ sudo mv $NVIM_FILENAME /opt
 # Create a symbolic link to the nvim executable
 sudo ln -sf "$INSTALL_DIR/bin/nvim" "/usr/local/bin/nvim"
 
+# Create the man page directory if it doesn't exist
+sudo mkdir -p /usr/local/share/man/man1
+
+# Symlink the man page
+sudo ln -sf "$INSTALL_DIR/share/man/man1/nvim.1" "/usr/local/share/man/man1/nvim.1"
+
 echo "Neovim installed successfully!"
