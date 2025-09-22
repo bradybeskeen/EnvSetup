@@ -7,3 +7,4 @@ mkdir -p $HOME/.local/share/fonts
 cp gomono_nerd/*.ttf $HOME/.local/share/fonts/
 rm -rf gomono_nerd*
 fc-cache -f
+echo "Restart your terminal to apply"
