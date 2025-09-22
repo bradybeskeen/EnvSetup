@@ -85,12 +85,6 @@ vim.o.confirm = true
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
--- Disable arrow keys in normal mode
-vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
-vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
-vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
-vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
-
 -- Keybinds to make split navigation easier.
 --  See `:help wincmd` for a list of all window commands
 vim.keymap.set('n', '<leader>wh', '<C-w>h', { desc = 'Move to left window' })
@@ -223,6 +217,7 @@ require('lazy').setup {
         dashboard.button('n', '  New File', '<cmd>enew<cr>'),
         dashboard.button('f', '  Find File', "<cmd>lua require('fzf-lua').files()<cr>"),
         dashboard.button('g', '  Find Word', "<cmd>lua require('fzf-lua').live_grep()<cr>"),
+        dashboard.button('c', '  Edit Config', '<cmd>edit $MYVIMRC<cr>'),
         dashboard.button('q', '  Quit', '<cmd>qa<cr>'),
       }
 
