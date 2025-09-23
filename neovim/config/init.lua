@@ -17,7 +17,7 @@ vim.o.relativenumber = true
 -- Always show the tabline, so the buffer list is visible
 vim.o.showtabline = 2
 
--- Enable mouse mode, can be useful for resizing splits for example!
+-- Enable mouse mode, can be useful for resizing splits
 vim.o.mouse = 'a'
 
 -- Don't show the mode, since it's already in the status line
@@ -915,6 +915,8 @@ require('lazy').setup {
         'zig',
         'javascript',
         'typescript',
+        'vue',
+        'css',
         'diff',
         'html',
         'lua',
