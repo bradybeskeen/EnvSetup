@@ -374,35 +374,23 @@ require('lazy').setup {
       local fzf = require 'fzf-lua'
       local actions = fzf.actions
 
-      -- Safely get the trouble action if the plugin is available
       local trouble_actions
       if pcall(require, 'trouble.sources.fzf') then
         trouble_actions = require('trouble.sources.fzf').actions
       end
 
       return {
-        -- GENERAL FZF SETTINGS
-        fzf_opts = { ['--no-scrollbar'] = true },
         winopts = {
           width = 0.8,
           height = 0.8,
           row = 0.5,
           col = 0.5,
+          prompt_icon = '❯ ',
           preview = { scrollchars = { '┃', '' } },
         },
-        keymap = {
-          fzf = {
-            ['ctrl-q'] = 'select-all+accept',
-            ['ctrl-u'] = 'half-page-up',
-            ['ctrl-d'] = 'half-page-down',
-            ['ctrl-x'] = 'jump',
-            ['ctrl-f'] = 'preview-page-down',
-            ['ctrl-b'] = 'preview-page-up',
-          },
-        },
+        fzf_opts = { ['--no-scrollbar'] = true },
         files = {
-          prompt = 'Files❯ ',
-          cwd_prompt = false,
+          cwd_prompt = false, -- Display path relative to CWD
           actions = {
             ['default'] = actions.file_edit,
             ['ctrl-t'] = trouble_actions and trouble_actions.open,
@@ -416,7 +404,6 @@ require('lazy').setup {
           },
         },
         grep = {
-          prompt = 'Grep❯ ',
           actions = {
             ['alt-i'] = actions.toggle_ignore,
             ['alt-h'] = actions.toggle_hidden,
@@ -424,29 +411,7 @@ require('lazy').setup {
         },
       }
     end,
-    config = function(_, opts)
-      local function fix(t)
-        t.prompt = t.prompt ~= nil and ' ' or nil
-        for _, v in pairs(t) do
-          if type(v) == 'table' then
-            fix(v)
-          end
-        end
-        return t
-      end
-      opts = vim.tbl_deep_extend('force', fix(require 'fzf-lua.profiles.default-title'), opts)
-      require('fzf-lua').setup(opts)
-    end,
     keys = {
-      { '<leader>,', '<cmd>FzfLua buffers sort_mru=true sort_lastused=true<cr>', desc = 'Switch Buffer' },
-      {
-        '<leader>/',
-        function()
-          require('fzf-lua').live_grep()
-        end,
-        desc = 'Grep (Root Dir)',
-      },
-      { '<leader>:', '<cmd>FzfLua command_history<cr>', desc = 'Command History' },
       -- find
       { '<leader>fb', '<cmd>FzfLua buffers sort_mru=true sort_lastused=true<cr>', desc = 'Buffers' },
       {
@@ -490,6 +455,15 @@ require('lazy').setup {
       { '<leader>sC', '<cmd>FzfLua commands<cr>', desc = 'Commands' },
       { '<leader>sd', '<cmd>FzfLua diagnostics_document<cr>', desc = 'Document Diagnostics' },
       { '<leader>sD', '<cmd>FzfLua diagnostics_workspace<cr>', desc = 'Workspace Diagnostics' },
+      { '<leader>sh', '<cmd>FzfLua help_tags<cr>', desc = 'Help Pages' },
+      { '<leader>sH', '<cmd>FzfLua highlights<cr>', desc = 'Search Highlight Groups' },
+      { '<leader>sj', '<cmd>FzfLua jumps<cr>', desc = 'Jumplist' },
+      { '<leader>sk', '<cmd>FzfLua keymaps<cr>', desc = 'Key Maps' },
+      { '<leader>sl', '<cmd>FzfLua loclist<cr>', desc = 'Location List' },
+      { '<leader>sM', '<cmd>FzfLua man_pages<cr>', desc = 'Man Pages' },
+      { '<leader>sm', '<cmd>FzfLua marks<cr>', desc = 'Jump to Mark' },
+      { '<leader>sR', '<cmd>FzfLua resume<cr>', desc = 'Resume' },
+      { '<leader>sq', '<cmd>FzfLua quickfix<cr>', desc = 'Quickfix List' },
       {
         '<leader>sg',
         function()
@@ -504,15 +478,6 @@ require('lazy').setup {
         end,
         desc = 'Grep (cwd)',
       },
-      { '<leader>sh', '<cmd>FzfLua help_tags<cr>', desc = 'Help Pages' },
-      { '<leader>sH', '<cmd>FzfLua highlights<cr>', desc = 'Search Highlight Groups' },
-      { '<leader>sj', '<cmd>FzfLua jumps<cr>', desc = 'Jumplist' },
-      { '<leader>sk', '<cmd>FzfLua keymaps<cr>', desc = 'Key Maps' },
-      { '<leader>sl', '<cmd>FzfLua loclist<cr>', desc = 'Location List' },
-      { '<leader>sM', '<cmd>FzfLua man_pages<cr>', desc = 'Man Pages' },
-      { '<leader>sm', '<cmd>FzfLua marks<cr>', desc = 'Jump to Mark' },
-      { '<leader>sR', '<cmd>FzfLua resume<cr>', desc = 'Resume' },
-      { '<leader>sq', '<cmd>FzfLua quickfix<cr>', desc = 'Quickfix List' },
       {
         '<leader>sw',
         function()
@@ -907,9 +872,15 @@ require('lazy').setup {
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
+      -- See :TSInstallInfo for opts
       ensure_installed = {
         'bash',
         'c',
+        'cpp',
+        'go',
+        'zig',
+        'javascript',
+        'typescript',
         'diff',
         'html',
         'lua',
