@@ -30,6 +30,12 @@ vim.schedule(function()
   vim.o.clipboard = 'unnamedplus'
 end)
 
+-- Set tab width to 2 spaces
+vim.o.tabstop = 2 -- Number of spaces that a <Tab> in the file counts for.
+vim.o.shiftwidth = 2 -- Number of spaces to use for each step of (auto)indent.
+vim.o.expandtab = false -- Use spaces instead of tabs.
+vim.o.softtabstop = 2 -- Number of spaces that a <Tab> counts for while performing editing operations.
+
 -- Enable break indent
 vim.o.breakindent = true
 
@@ -152,8 +158,6 @@ rtp:prepend(lazypath)
 
 -- [[ Configure and install plugins ]]
 require('lazy').setup {
-  'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
-
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
   -- keys can be used to configure plugin behavior/loading/etc.
