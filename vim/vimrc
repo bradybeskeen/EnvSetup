@@ -1,0 +1,12 @@
+set number
+set relativenumber
+syntax enable
+set smartindent
+set noswapfile
+
+filetype plugin indent on
+set tabstop=2 "Number of spaces that a <Tab> in the file counts for.
+set shiftwidth=2 "Number of spaces to use for each step of (auto)indent.
+set expandtab "Convert tabs to spaces
+set listchars=tab:»\ ,extends:›,precedes:‹,nbsp:·,trail:·
+set list
