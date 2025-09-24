@@ -4,6 +4,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 vim.o.guifont = 'Go Mono Nerd Font:h14'
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
@@ -871,8 +872,7 @@ require('lazy').setup {
       vim.cmd.colorscheme 'tokyonight-night'
     end,
   },
-  -- Highlight todo, notes, etc in comments
-  {
+  { -- Highlight todo, notes, etc in comments
     'folke/todo-comments.nvim',
     event = 'VimEnter',
     dependencies = { 'nvim-lua/plenary.nvim' },
