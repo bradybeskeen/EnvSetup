@@ -131,6 +131,16 @@ install_zig() {
 
 install_rust() {
 	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+	rustup update
+}
+
+# Rust must be installed first
+install_yazi() {
+	git clone https://github.com/sxyazi/yazi.git
+	cd yazi
+	cargo build --release --locked
+	mv target/release/yazi target/release/ya /usr/local/bin/
+
 }
 
 install_go() {
@@ -145,4 +155,5 @@ install_nerd_font
 install_node_js
 install_lua
 install_zig
+install_go
 install_rust
