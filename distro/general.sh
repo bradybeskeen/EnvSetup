@@ -36,6 +36,8 @@ install_lua() {
 	curl -L -R -O https://www.lua.org/ftp/lua-5.4.8.tar.gz
 	tar zxf lua-5.4.8.tar.gz
 	cd lua-5.4.8
+	make linux
+	make test
 	sudo make install
 	cd ..
 
