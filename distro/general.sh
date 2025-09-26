@@ -127,8 +127,20 @@ install_zig() {
 	sudo ln -s /opt/$ZIG_DIRECTORY/zig /usr/local/bin/
 }
 
+install_rust() {
+	curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+}
+
+install_go() {
+	rm -rf /usr/local/go && tar -C /usr/local -xzf go1.25.1.linux-amd64.tar.gz
+	echo 'export PATH=$PATH:/usr/local/go/bin' >>~/.profile
+	source ~/.profile
+	go version
+}
+
 # TODO: One day call these conditionally only if not already in system
-#install_nerd_font
-#install_node_js
-#install_lua
+install_nerd_font
+install_node_js
+install_lua
 install_zig
+install_rust
