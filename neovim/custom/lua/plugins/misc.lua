@@ -1,4 +1,5 @@
 return {
+  { 'lewis6991/gitsigns.nvim' },
   {
     'folke/persistence.nvim',
     event = 'VimEnter', -- Tries to load the session when you start nvim
