@@ -6,14 +6,14 @@ set -e
 # Check if an argument was provided. If not, print an error and usage info, then exit.
 if [ -z "$1" ]; then
 	echo "Error: No configuration specified." >&2
-	echo "Usage: $0 [custom|lazyvim]" >&2
+	echo "Usage: $0 [custom|lazyvim|minimal]" >&2
 	exit 1
 fi
 
 # Check if the argument is one of the allowed values.
-if [ "$1" != "custom" ] && [ "$1" != "lazyvim" ]; then
+if [ "$1" != "custom" ] && [ "$1" != "lazyvim" ] && ["$1" != "minimal"]; then
 	echo "Error: Invalid configuration '$1' specified." >&2
-	echo "Please use 'custom' or 'lazyvim'." >&2
+	echo "Please use 'custom', 'lazyvim' or 'minimal'." >&2
 	exit 1
 fi
 
