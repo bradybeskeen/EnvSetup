@@ -99,15 +99,9 @@ vim.keymap.set('n', '<leader>wj', '<C-w>j', { desc = 'Move to lower window' })
 vim.keymap.set('n', '<leader>wk', '<C-w>k', { desc = 'Move to upper window' })
 vim.keymap.set('n', '<leader>wl', '<C-w>l', { desc = 'Move to right window' })
 
--- Some terminals have colliding keymaps or are not able to send distinct keycodes
--- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
--- vim.keymap.set("n", "<C-S-l>", "<C-w>L", { desc = "Move window to the right" })
--- vim.keymap.set("n", "<C-S-j>", "<C-w>J", { desc = "Move window to the lower" })
--- vim.keymap.set("n", "<C-S-k>", "<C-w>K", { desc = "Move window to the upper" })
-
 -- [[ Buffer Navigation and Management ]]
-vim.keymap.set('n', '<leader>bd', '<cmd>bdelete<CR>', { desc = 'Delete Buffer' })
-vim.keymap.set('n', '<leader>bc', '<cmd>%bd|e#<CR>', { desc = 'Close All Other Buffers' })
+vim.keymap.set('n', '<leader>bd', '<cmd>bdelete<CR>', { desc = '' })
+vim.keymap.set('n', '<leader>bc', '<cmd>%bd|e#<CR>', { desc = '' })
 vim.keymap.set('n', 'H', '<cmd>bprevious<CR>', { desc = 'Previous Buffer' })
 vim.keymap.set('n', 'L', '<cmd>bnext<CR>', { desc = 'Next Buffer' })
 
@@ -197,6 +191,13 @@ require('lazy').setup {
       -- delay between pressing a key and opening which-key (milliseconds)
       -- this setting is independent of vim.o.timeoutlen
       delay = 0,
+      filter = function(mapping)
+        -- The mapping object has a 'desc' field.
+        -- If you set { desc = "..." }, mapping.desc will be "..."
+        -- If you didn't provide a 'desc', mapping.desc will be nil.
+        -- We return true only if the description is a non-empty string.
+        return mapping.desc ~= nil and mapping.desc ~= ''
+      end,
       icons = {
         -- set icon mappings to true if you have a Nerd Font
         mappings = vim.g.have_nerd_font,
@@ -240,9 +241,9 @@ require('lazy').setup {
         { '<leader>t', group = 'trouble' },
         { '<leader>c', group = 'code' },
         { '<leader>w', group = 'window' },
+        --{ '<leader>b', group = 'buffer' },
         { '<leader>g', group = 'git' },
         { '<leader>f', group = 'find' },
-        { '<leader>b', group = 'buffers' },
         { '<leader>x', group = 'extras' },
       },
     },
