@@ -31,6 +31,7 @@ return {
           ['q'] = 'actions.close',
         },
       }
+      vim.keymap.set('n', '<leader>e', ':Oil<CR>', { desc = 'oil' })
     end,
   },
 }

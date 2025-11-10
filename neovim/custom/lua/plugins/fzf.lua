@@ -71,8 +71,8 @@ return {
         end,
         desc = 'Find Files (cwd)',
       },
-      { '<leader>fg', '<cmd>FzfLua git_files<cr>', desc = 'Find Files (git-files)' },
-      { '<leader>fr', '<cmd>FzfLua oldfiles<cr>', desc = 'Recent' },
+      { '<leader>gg', '<cmd>FzfLua git_files<cr>', desc = 'Find Files (git-files)' },
+      { '<leader>gr', '<cmd>FzfLua oldfiles<cr>', desc = 'Recent' },
       {
         '<leader>fR',
         function()
@@ -101,21 +101,21 @@ return {
       { '<leader>sR', '<cmd>FzfLua resume<cr>', desc = 'Resume' },
       { '<leader>sq', '<cmd>FzfLua quickfix<cr>', desc = 'Quickfix List' },
       {
-        '<leader>sg',
+        '<leader>fg',
         function()
           require('fzf-lua').live_grep()
         end,
         desc = 'Grep (Root Dir)',
       },
       {
-        '<leader>sG',
+        '<leader>fG',
         function()
           require('fzf-lua').live_grep { cwd_only = true }
         end,
         desc = 'Grep (cwd)',
       },
       {
-        '<leader>sw',
+        '<leader>fw',
         function()
           require('fzf-lua').grep_cword()
         end,

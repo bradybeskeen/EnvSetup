@@ -244,7 +244,6 @@ require('lazy').setup {
         { '<leader>f', group = 'find' },
         { '<leader>b', group = 'buffers' },
         { '<leader>x', group = 'extras' },
-        { '<leader>y', group = 'yazi' },
       },
     },
   },
