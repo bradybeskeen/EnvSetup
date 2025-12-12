@@ -3,9 +3,44 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
+# Get OS name
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+
+# Map 'darwin' to 'macos'
+if [ "$OS" = "darwin" ]; then
+	OS="macos"
+fi
+
+# Get Architecture
+ARCH=$(uname -m)
+
+# Normalize Architecture names
+case "$ARCH" in
+"x86_64")
+	ARCH="x86_64"
+	;;
+"aarch64" | "arm64")
+	ARCH="arm64"
+	;;
+"armv7l")
+	echo "Error: You are running a 32-bit OS (armv7l)."
+	echo "Neovim releases only support 64-bit (arm64) or x86_64."
+	exit 1
+	;;
+*)
+	echo "Unsupported architecture: $ARCH"
+	exit 1
+	;;
+esac
+
 # Neovim filename
-NVIM_FILENAME=nvim-linux-x86_64
+NVIM_FILENAME="nvim-$OS-$ARCH"
 INSTALL_DIR="/opt/$NVIM_FILENAME"
+
+echo "Detected System: $OS"
+echo "Detected Arch:   $ARCH"
+echo "Target Filename: $NVIM_FILENAME"
+echo "--------------------------------"
 
 # Get the nvim executable
 curl -LO "https://github.com/neovim/neovim/releases/download/stable/$NVIM_FILENAME.tar.gz"
@@ -18,7 +53,7 @@ rm -f "$NVIM_FILENAME.tar.gz"
 
 # Remove old installation if it exists
 if [ -d "$INSTALL_DIR" ]; then
-  sudo rm -rf "$INSTALL_DIR"
+	sudo rm -rf "$INSTALL_DIR"
 fi
 
 # Move the nvim directory to /opt
