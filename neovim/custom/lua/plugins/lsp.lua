@@ -140,10 +140,10 @@ return {
             },
           },
         },
-        clangd = {},
-        gopls = {},
-        zls = {},
-        ts_ls = {},
+        --clangd = {},
+        --gopls = {},
+        --zls = {},
+        --ts_ls = {},
       }
 
       local ensure_installed = vim.tbl_keys(servers or {})
