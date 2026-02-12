@@ -26,6 +26,7 @@ return {
         },
         fzf_opts = { ['--no-scrollbar'] = true },
         files = {
+          fd_opts = [[--color=never --type f --hidden --no-ignore --exclude .git]],
           cwd_prompt = false, -- Display path relative to CWD
           actions = {
             ['default'] = actions.file_edit,
@@ -40,6 +41,7 @@ return {
           },
         },
         grep = {
+          rg_opts = "--column --line-number --no-heading --color=always --smart-case --max-columns=4096 --hidden --no-ignore -g '!.git/' -e",
           actions = {
             ['alt-i'] = actions.toggle_ignore,
             ['alt-h'] = actions.toggle_hidden,
