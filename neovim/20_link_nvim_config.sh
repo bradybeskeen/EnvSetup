@@ -6,14 +6,14 @@ set -e
 # Check if an argument was provided. If not, print an error and usage info, then exit.
 if [ -z "$1" ]; then
 	echo "Error: No configuration specified." >&2
-	echo "Usage: $0 [custom|minimal]" >&2
+	echo "Usage: $0 [custom|zen]" >&2
 	exit 1
 fi
 
 # Check if the argument is one of the allowed values.
-if [ "$1" != "custom" ] && ["$1" != "minimal"]; then
+if [ "$1" != "custom" ] && ["$1" != "zen"]; then
 	echo "Error: Invalid configuration '$1' specified." >&2
-	echo "Please use 'custom' or 'minimal'." >&2
+	echo "Please use 'custom' or 'zen'." >&2
 	exit 1
 fi
 
