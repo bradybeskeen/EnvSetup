@@ -85,6 +85,8 @@ vim.o.scrolloff = 10
 -- See `:help 'confirm'`
 vim.o.confirm = true
 
+vim.cmd.colorscheme 'lunaperche'
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -237,12 +239,10 @@ require('lazy').setup {
 
       -- Document existing key chains
       spec = {
-        { '<leader>s', group = 'search' },
         { '<leader>t', group = 'trouble' },
-        { '<leader>c', group = 'code' },
+        { '<leader>c', group = 'code'},
         { '<leader>w', group = 'window' },
-        --{ '<leader>b', group = 'buffer' },
-        { '<leader>g', group = 'git' },
+        { '<leader>b', group = 'buffer' },
         { '<leader>f', group = 'find' },
         { '<leader>x', group = 'extras' },
       },

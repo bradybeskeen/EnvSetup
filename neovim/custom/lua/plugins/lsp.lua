@@ -21,37 +21,34 @@ return {
         callback = function(event)
           local map = function(keys, func, desc, mode)
             mode = mode or 'n'
-            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = desc })
           end
 
           -- Rename the variable under your cursor.
           --  Most Language Servers support renaming across files, etc.
-          map('grn', vim.lsp.buf.rename, 'Rename')
+          map('<leader>cr', vim.lsp.buf.rename, 'Rename')
 
           -- Execute a code action, usually your cursor needs to be on top of an error
           -- or a suggestion from your LSP for this to activate.
-          map('gra', vim.lsp.buf.code_action, 'Goto Code Action', { 'n', 'x' })
+          map('<leader>ca', vim.lsp.buf.code_action, 'Code Action', { 'n', 'x' })
 
-          --Find references for the word under your cursor.
-          map('grr', require('fzf-lua').lsp_references, 'Goto References')
+          -- Show diagnostics for current line in a float window.
+          map('<leader>cx', vim.diagnostic.open_float, 'Line Diagnostics')
+
+          -- Find references for the word under your cursor.
+          map('<leader>cR', require('fzf-lua').lsp_references, 'References')
 
           -- Jump to the implementation of the word under your cursor.
-          map('gri', require('fzf-lua').lsp_implementations, 'Goto Implementation')
+          map('<leader>ci', require('fzf-lua').lsp_implementations, 'Implementation')
 
           -- Jump to the definition of the word under your cursor.
-          map('grd', require('fzf-lua').lsp_definitions, 'Goto Definition')
+          map('<leader>cd', require('fzf-lua').lsp_definitions, 'Definition')
 
           -- WARN: This is not Goto Definition, this is Goto Declaration.
-          map('grD', vim.lsp.buf.declaration, 'Goto Declaration')
-
-          -- Fuzzy find all the symbols in your current document.
-          map('gO', require('fzf-lua').lsp_document_symbols, 'Open Document Symbols')
-
-          -- Fuzzy find all the symbols in your current workspace.
-          map('gW', require('fzf-lua').lsp_workspace_symbols, 'Open Workspace Symbols')
+          map('<leader>cD', vim.lsp.buf.declaration, 'Declaration')
 
           -- Jump to the type of the word under your cursor.
-          map('grt', require('fzf-lua').lsp_typedefs, 'Goto Type Definition')
+          map('<leader>ct', require('fzf-lua').lsp_typedefs, 'Type Definition')
 
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
@@ -87,7 +84,7 @@ return {
           --
           -- This may be unwanted, since they displace some of your code
           if client and client.server_capabilities.inlayHintProvider then
-            map('<leader>xh', function()
+            map('<leader>ch', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
             end, 'Toggle Inlay Hints')
           end
