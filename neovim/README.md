@@ -1,4 +1,4 @@
 # neovim
 
-custom - lazy.nvim managed version that sets up a personal version of neovim
-minimal - a minial config with no plugins for bare environments
+ide - lazy.nvim managed version that sets up a development environment experience in neovim
+zen - a minial config with no plugins for bare environments
