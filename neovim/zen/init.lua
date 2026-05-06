@@ -1,15 +1,27 @@
--- A zen neovim config that can be copied to limited resource environment
--- No plugins in this config
+-- A zen neovim config for limited resource environments
+-- No plugins, optimized for headless servers
 
--- Set <space> as the leader key
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-
--- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
--- [[ Options ]]
+-- [[ Clipboard ]]
+-- Detects SSH and ensures the osc52 module exists before applying
+if vim.env.SSH_TTY then
+  local ok, osc52 = pcall(require, 'vim.ui.clipboard.osc52')
+  if ok then
+    vim.g.clipboard = {
+      name = 'OSC 52',
+      copy = { ['+'] = osc52.copy '+', ['*'] = osc52.copy '*' },
+      paste = { ['+'] = osc52.paste '+', ['*'] = osc52.paste '*' },
+    }
+  end
+end
 
+-- Use system clipboard for all yanks
+vim.o.clipboard = 'unnamedplus'
+
+-- [[ Options ]]
 vim.o.number = true
 vim.o.relativenumber = true
 vim.o.mouse = 'a'
@@ -38,17 +50,23 @@ vim.cmd.colorscheme 'lunaperche'
 -- [[ Statusline ]]
 _G.ZenStatusline = function()
   local mode_map = {
-    n = 'NORMAL', i = 'INSERT', v = 'VISUAL', V = 'V-LINE',
-    ['\22'] = 'V-BLOCK', c = 'COMMAND', R = 'REPLACE', t = 'TERMINAL', s = 'SELECT',
+    n = 'NORMAL',
+    i = 'INSERT',
+    v = 'VISUAL',
+    V = 'V-LINE',
+    ['\22'] = 'V-BLOCK',
+    c = 'COMMAND',
+    R = 'REPLACE',
+    t = 'TERMINAL',
+    s = 'SELECT',
   }
   local mode = mode_map[vim.fn.mode()] or vim.fn.mode()
   local file = vim.fn.expand '%:t'
-  if file == '' then file = '[No Name]' end
+  file = (file == '') and '[No Name]' or file
   local modified = vim.bo.modified and ' [+]' or ''
   local readonly = vim.bo.readonly and ' [RO]' or ''
   local ft = vim.bo.filetype ~= '' and vim.bo.filetype or ''
-  local line = vim.fn.line '.'
-  local col = vim.fn.col '.'
+  local line, col = vim.fn.line '.', vim.fn.col '.'
   local total = vim.fn.line '$'
   local pct = total > 0 and math.floor(line / total * 100) .. '%%' or '0%%'
   return string.format(' %s  %s%s%s %%=%s  %d:%d  %s ', mode, file, modified, readonly, ft, line, col, pct)
@@ -61,13 +79,10 @@ _G.ZenTabline = function()
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     if vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].buflisted then
       local name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(buf), ':t')
-      if name == '' then name = '[No Name]' end
+      name = (name == '') and '[No Name]' or name
       local modified = vim.bo[buf].modified and ' [+]' or ''
-      if buf == vim.api.nvim_get_current_buf() then
-        s = s .. '%#TabLineSel# ' .. name .. modified .. ' %#TabLine#'
-      else
-        s = s .. '%#TabLine# ' .. name .. modified .. ' '
-      end
+      local highlight = (buf == vim.api.nvim_get_current_buf()) and '%#TabLineSel#' or '%#TabLine#'
+      s = s .. highlight .. ' ' .. name .. modified .. ' '
     end
   end
   return s .. '%#TabLineFill#'
@@ -84,70 +99,53 @@ vim.api.nvim_create_autocmd('FileType', {
   pattern = 'netrw',
   callback = function()
     vim.keymap.set('n', 'q', function()
-      local ok = pcall(vim.cmd, 'Rex')
-      if not ok then vim.cmd 'bprevious' end
+      pcall(vim.cmd, 'Rex')
     end, { buffer = true })
   end,
 })
 
 -- [[ Keymaps ]]
-
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
--- Window navigation
-vim.keymap.set('n', '<leader>wh', '<C-w>h', { desc = 'Move to left window' })
-vim.keymap.set('n', '<leader>wj', '<C-w>j', { desc = 'Move to lower window' })
-vim.keymap.set('n', '<leader>wk', '<C-w>k', { desc = 'Move to upper window' })
-vim.keymap.set('n', '<leader>wl', '<C-w>l', { desc = 'Move to right window' })
+-- Window/Buffer Nav
+vim.keymap.set('n', '<leader>wh', '<C-w>h', { desc = 'Move Left' })
+vim.keymap.set('n', '<leader>wj', '<C-w>j', { desc = 'Move Down' })
+vim.keymap.set('n', '<leader>wk', '<C-w>k', { desc = 'Move Up' })
+vim.keymap.set('n', '<leader>wl', '<C-w>l', { desc = 'Move Right' })
+vim.keymap.set('n', '<leader>bd', '<cmd>bdelete<CR>')
+vim.keymap.set('n', 'H', '<cmd>bprevious<CR>')
+vim.keymap.set('n', 'L', '<cmd>bnext<CR>')
+vim.keymap.set('n', '<leader>e', '<cmd>Explore<CR>')
 
--- Buffer navigation
-vim.keymap.set('n', '<leader>bd', '<cmd>bdelete<CR>', { desc = 'Delete Buffer' })
-vim.keymap.set('n', '<leader>bc', '<cmd>%bd|e#<CR>', { desc = 'Close All Other Buffers' })
-vim.keymap.set('n', 'H', '<cmd>bprevious<CR>', { desc = 'Previous Buffer' })
-vim.keymap.set('n', 'L', '<cmd>bnext<CR>', { desc = 'Next Buffer' })
-
--- File explorer
-vim.keymap.set('n', '<leader>e', '<cmd>Explore<CR>', { desc = 'File Explorer' })
-
--- Auto-pairs (brackets only)
+-- Auto-pairs (Basic)
 local autopairs = { ['('] = ')', ['['] = ']', ['{'] = '}' }
 for open, close in pairs(autopairs) do
   vim.keymap.set('i', open, open .. close .. '<Left>')
 end
+
 vim.keymap.set('i', '<BS>', function()
   local col = vim.fn.col '.'
   local line = vim.api.nvim_get_current_line()
-  local before = line:sub(col - 1, col - 1)
-  local after = line:sub(col, col)
-  local close_map = { ['('] = ')', ['['] = ']', ['{'] = '}' }
-  if close_map[before] == after then
+  local char_before = line:sub(col - 1, col - 1)
+  local char_after = line:sub(col, col)
+  if autopairs[char_before] == char_after then
     return '<BS><Del>'
   end
   return '<BS>'
-end, { expr = true })
+end, { expr = true, replace_keycodes = true })
 
 -- [[ Autocommands ]]
-
--- Highlight when yanking
 vim.api.nvim_create_autocmd('TextYankPost', {
-  desc = 'Highlight when yanking (copying) text',
-  group = vim.api.nvim_create_augroup('zen-highlight-yank', { clear = true }),
   callback = function()
     vim.hl.on_yank()
   end,
 })
 
--- Go to last location when opening a buffer
 vim.api.nvim_create_autocmd('BufReadPost', {
-  desc = 'Go to last location when opening a buffer',
-  group = vim.api.nvim_create_augroup('zen-last-loc', { clear = true }),
-  pattern = '*',
   callback = function(event)
     local mark = vim.api.nvim_buf_get_mark(event.buf, '"')
-    local line_num = mark[1]
-    local last_line = vim.api.nvim_buf_line_count(event.buf)
-    if line_num > 0 and line_num <= last_line then
-      vim.api.nvim_win_set_cursor(0, mark)
+    if mark[1] > 0 and mark[1] <= vim.api.nvim_buf_line_count(event.buf) then
+      pcall(vim.api.nvim_win_set_cursor, 0, mark)
     end
   end,
 })
