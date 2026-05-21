@@ -6,18 +6,6 @@ vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
 
 -- [[ Clipboard ]]
--- Detects SSH and ensures the osc52 module exists before applying
-if vim.env.SSH_TTY then
-  local ok, osc52 = pcall(require, 'vim.ui.clipboard.osc52')
-  if ok then
-    vim.g.clipboard = {
-      name = 'OSC 52',
-      copy = { ['+'] = osc52.copy '+', ['*'] = osc52.copy '*' },
-      paste = { ['+'] = osc52.paste '+', ['*'] = osc52.paste '*' },
-    }
-  end
-end
-
 -- Use system clipboard for all yanks
 vim.o.clipboard = 'unnamedplus'
 
