@@ -24,6 +24,10 @@ return {
         enable_mouse = true,
         show_icons = vim.g.have_nerd_font,
       }
+
+      -- Make active buffer clearly stand out in tabline (Sharks teal)
+      vim.api.nvim_set_hl(0, 'MiniTablineCurrent', { bg = '#007A87', fg = '#ffffff', bold = true })
+      vim.api.nvim_set_hl(0, 'MiniTablineModifiedCurrent', { bg = '#007A87', fg = '#ffffff', bold = true, italic = true })
     end,
   },
 }

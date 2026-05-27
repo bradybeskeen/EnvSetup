@@ -62,6 +62,8 @@ end
 vim.o.statusline = '%!v:lua.ZenStatusline()'
 
 -- [[ Tabline ]]
+vim.api.nvim_set_hl(0, 'ZenTabLineCurrent', { bg = '#007A87', fg = '#ffffff', bold = true })
+
 _G.ZenTabline = function()
   local s = ''
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -69,8 +71,11 @@ _G.ZenTabline = function()
       local name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(buf), ':t')
       name = (name == '') and '[No Name]' or name
       local modified = vim.bo[buf].modified and ' [+]' or ''
-      local highlight = (buf == vim.api.nvim_get_current_buf()) and '%#TabLineSel#' or '%#TabLine#'
-      s = s .. highlight .. ' ' .. name .. modified .. ' '
+      if buf == vim.api.nvim_get_current_buf() then
+        s = s .. '%#ZenTabLineCurrent# ' .. name .. modified .. ' '
+      else
+        s = s .. '%#TabLine# ' .. name .. modified .. ' '
+      end
     end
   end
   return s .. '%#TabLineFill#'
