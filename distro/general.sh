@@ -207,13 +207,34 @@ install_go() {
 	echo "Go installation complete. Please run 'source ~/.profile' or restart your shell."
 }
 
-# --- Execution ---
-install_nerd_font
-install_node_js
-install_lua
-install_zig
-install_go
-install_rust
-install_yazi
+# Set Go Mono Nerd Font as default monospace font for the current DE
+set_default_font() {
+	FONT_NAME="GoMono Nerd Font"
+	FONT_SIZE="11"
 
-echo -e "\nAll installations complete!"
+	case "$XDG_CURRENT_DESKTOP" in
+		*GNOME*)
+			if command -v gsettings >/dev/null 2>&1; then
+				gsettings set org.gnome.desktop.interface monospace-font-name "${FONT_NAME} ${FONT_SIZE}"
+				echo "Default monospace font set (GNOME)."
+			else
+				echo "gsettings not found. Set monospace font manually."
+			fi
+			;;
+		*KDE*)
+			if command -v kwriteconfig6 >/dev/null 2>&1; then
+				kwriteconfig6 --file kdeglobals --group General --key fixed "${FONT_NAME},${FONT_SIZE},-1,5,50,0,0,0,0,0"
+				echo "Default monospace font set (KDE, kwriteconfig6)."
+			elif command -v kwriteconfig5 >/dev/null 2>&1; then
+				kwriteconfig5 --file kdeglobals --group General --key fixed "${FONT_NAME},${FONT_SIZE},-1,5,50,0,0,0,0,0"
+				echo "Default monospace font set (KDE, kwriteconfig5)."
+			else
+				echo "kwriteconfig not found. Set monospace font manually."
+			fi
+			;;
+		*)
+			echo "Unknown DE '${XDG_CURRENT_DESKTOP}'. Set monospace font manually."
+			;;
+	esac
+}
+
