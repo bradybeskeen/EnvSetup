@@ -42,6 +42,8 @@ return {
         },
         grep = {
           rg_opts = "--column --line-number --no-heading --color=always --smart-case --max-columns=4096 --hidden --no-ignore -g '!.git/' -e",
+          rg_glob = true, -- allows inline glob: `pattern -- *.lua` or `pattern -- *.ts,*.js`
+          silent = true, -- suppress false-positive "--line-number missing" warning from rg_glob
           actions = {
             ['alt-i'] = actions.toggle_ignore,
             ['alt-h'] = actions.toggle_hidden,
