@@ -25,4 +25,4 @@ source $ZSH/oh-my-zsh.sh
 eval "$(oh-my-posh init zsh --config ${${(%):-%x}:A:h}/powerlevel10k_brady.omp.json)"
 
 # Create ~/.zshrc.local for all configs specific to current machine.
-if [[ -f ~/.zshrc.local ]]; then source ~/.zshrc.local fi
+if [[ -f ~/.zshrc.local ]]; then source ~/.zshrc.local; fi
