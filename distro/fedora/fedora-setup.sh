@@ -10,3 +10,7 @@ sudo dnf install -y make cmake ninja-build gettext libtool autoconf automake cma
 
 install_nerd_font
 set_default_font
+
+# Install lazygit
+sudo dnf copr enable atim/lazygit -y
+sudo dnf install -y lazygit
