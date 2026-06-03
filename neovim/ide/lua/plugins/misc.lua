@@ -26,19 +26,16 @@ return {
     },
   },
   { 'm4xshen/autoclose.nvim', event = 'InsertEnter', config = true }, --Close brackets
-  -- { --Using the tokyonight colorscheme
-  --   'folke/tokyonight.nvim',
-  --   priority = 1000,
-  --   config = function()
-  --     ---@diagnostic disable-next-line: missing-fields
-  --     require('tokyonight').setup {
-  --       styles = {
-  --         comments = { italic = false },
-  --       },
-  --     }
-  --     vim.cmd.colorscheme 'tokyonight-night'
-  --   end,
-  -- },
+  {
+    'rebelot/kanagawa.nvim',
+    priority = 1000,
+    config = function()
+      require('kanagawa').setup {
+        commentStyle = { italic = false },
+      }
+      vim.cmd.colorscheme 'kanagawa'
+    end,
+  },
   { -- Highlight todo, notes, etc in comments
     'folke/todo-comments.nvim',
     event = 'VimEnter',

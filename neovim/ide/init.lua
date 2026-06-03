@@ -39,7 +39,6 @@ vim.o.cursorline = true
 vim.o.scrolloff = 10
 vim.o.confirm = true
 
-vim.cmd.colorscheme 'lunaperche'
 
 -- [[ Keymaps ]]
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
