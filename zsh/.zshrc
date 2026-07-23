@@ -3,8 +3,9 @@ HISTSIZE=10000
 SAVEHIST=10000
 setopt appendhistory
 
+export VISUAL=nvim
 export EDITOR=nvim
-alias vim='$EDITOR'
+alias vim='$VISUAL'
 
 export ZSH="$HOME/.oh-my-zsh"
 export PATH=$PATH:$HOME/.local/bin
